@@ -66,6 +66,20 @@ echo "        "
 
 If icons display correctly → you're good
 
+### Recommended Fonts
+
+- FiraCode Nerd Font
+- JetBrainsMono Nerd Font
+- Hack Nerd Font
+
+### Notes
+
+- Termux ONLY uses: `~/.termux/font.ttf`
+- You must reload settings after installing
+- Required for:
+  - nvim-tree
+  - nvim-web-devicons
+
 ---
 
 ## Themes
@@ -102,8 +116,7 @@ Selected style is saved automatically and restored on restart.
 
 ---
 
-## Features
-### File Explorer
+## File Explorer
 
 - Uses nvim-tree
 - Opens automatically on startup
@@ -119,6 +132,12 @@ Example:
 
 ```
 :Telescope find_files
+```
+
+- Change themes
+
+```
+:Telescope colorscheme
 ```
 
 ---
@@ -146,9 +165,9 @@ Example:
 ## Plugin Management
 
 ```
-:Lazy update  
-:Lazy clean  
-:Lazy sync  
+:Lazy update  " update plugins
+:Lazy clean   " remove unused plugins
+:Lazy sync    " install missing plugins
 ```
 
 ---
