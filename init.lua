@@ -170,6 +170,17 @@ vim.keymap.set("n", "<leader>r", function()
 end)
 vim.keymap.set("n", "<leader>f", require("telescope.builtin").live_grep, {})
 vim.keymap.set("n", "<leader>ff", require("telescope.builtin").find_files, {})
+vim.keymap.set("v", "y", "ygv")
+vim.keymap.set("n", "p", function()
+  local text = vim.fn.system("termux-clipboard-get")
+  if text ~= "" then
+    vim.api.nvim_put(vim.split(text, "\n"), "c", true, true)
+  else
+    vim.cmd("normal! p")
+  end
+end)
+vim.keymap.set("n", "<leader>d", '"_d')
+vim.keymap.set("v", "<leader>d", '"_d')
 
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
