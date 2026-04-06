@@ -1,5 +1,7 @@
 # Minimal Neovim Config (Lazy.nvim)
 
+🌐 [EN](README.md) | [TH](README.th.md) | [JP](README.jp.md) | [CN](README.cn.md) | [KR](README.kr.md)
+
 ![preview](init_example.jpg)
 
 A simple **single-file Neovim configuration** using `lazy.nvim`.

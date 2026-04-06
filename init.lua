@@ -181,6 +181,7 @@ vim.keymap.set("n", "p", function()
 end)
 vim.keymap.set("n", "<leader>d", '"_d')
 vim.keymap.set("v", "<leader>d", '"_d')
+vim.keymap.set("n", "<leader>a", "ggVG")
 
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
