@@ -50,12 +50,10 @@ mkdir -p ~/.config/nvim
 ```
 
 ```bash
-# Backup หากมี config เดิมอยู่แล้ว
 [ -f ~/.config/nvim/init.lua ] && cp ~/.config/nvim/init.lua ~/.config/nvim/init.lua.bak
 ```
 
 ```bash
-# ดาวน์โหลด init.lua
 curl -o ~/.config/nvim/init.lua https://raw.githubusercontent.com/DragoonT/init-termux-neovim/main/init.lua
 ```
 

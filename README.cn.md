@@ -49,11 +49,9 @@ git clone https://github.com/DragoonT/init-termux-neovim.git init
 mkdir -p ~/.config/nvim
 ```
 ```bash
-# 如果已有配置则备份
 [ -f ~/.config/nvim/init.lua ] && cp ~/.config/nvim/init.lua ~/.config/nvim/init.lua.bak
 ```
 ```bash
-# 下载 init.lua
 curl -o ~/.config/nvim/init.lua https://raw.githubusercontent.com/DragoonT/init-termux-neovim/main/init.lua
 ```
 

@@ -376,6 +376,24 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback = function()
+    if vim.v.event.operator ~= "y" then return end
+
+    local text = vim.fn.getreg('"')
+    if text == "" then return end
+
+    local job_id = vim.fn.jobstart({ "termux-clipboard-set" }, {
+      stdin = "pipe",
+    })
+
+    if job_id > 0 then
+      vim.fn.chansend(job_id, text)
+      vim.fn.chanclose(job_id, "stdin")
+    end
+  end,
+})
+
 -- toggle key (Space + e)
 vim.g.mapleader = " "
 
@@ -436,36 +454,56 @@ vim.keymap.set("n", "<leader>fs", function()
   smart_find("/storage/emulated/0")
 end, {})
 vim.keymap.set("n", "<leader>fr", require("telescope.builtin").oldfiles, {})
--- vim.keymap.set("v", "y", "ygv")
-vim.keymap.set({ "n", "v" }, "y", function()
-  vim.cmd('normal! "' .. vim.v.register .. 'y')
-
-  local text = vim.fn.getreg('"')
-  if text == "" then return end
-
-  local job_id = vim.fn.jobstart({ "termux-clipboard-set" }, {
-    stdin = "pipe",
-  })
-
-  if job_id > 0 then
-    vim.fn.chansend(job_id, text)
-    vim.fn.chanclose(job_id, "stdin")
-  end
-end, { noremap = true })
-vim.keymap.set("n", "p", '"0p')
+vim.keymap.set("v", "y", "ygv")
+-- vim.keymap.set({ "n", "v" }, "y", function()
+--   vim.cmd('normal! "' .. vim.v.register .. 'y')
+--
+--   local text = vim.fn.getreg('"')
+--   if text == "" then return end
+--
+--   local job_id = vim.fn.jobstart({ "termux-clipboard-set" }, {
+--     stdin = "pipe",
+--   })
+--
+--   if job_id > 0 then
+--     vim.fn.chansend(job_id, text)
+--     vim.fn.chanclose(job_id, "stdin")
+--   end
+-- end, { noremap = true })
+-- vim.keymap.set("n", "p", '"0p')
 vim.keymap.set("n", "P", '"0P')
-vim.keymap.set("n", "<leader>p", function()
+vim.keymap.set("n", "p", function()
+  local reg0 = vim.fn.getreg("0")
+
+  if reg0 ~= "" then
+    vim.cmd('normal! "0p')
+    return
+  end
+
   vim.fn.jobstart({ "termux-clipboard-get" }, {
     stdout_buffered = true,
     on_stdout = function(_, data)
-      if not data then return end
-      local text = table.concat(data, "\n")
+      local text = table.concat(data or {}, "\n")
       if text ~= "" then
-        vim.api.nvim_put(vim.split(text, "\n"), "c", true, true)
+        vim.schedule(function()
+          vim.api.nvim_put(vim.split(text, "\n"), "c", true, true)
+        end)
       end
     end,
   })
-end)
+end, { noremap = true })
+-- vim.keymap.set("n", "<leader>p", function()
+--   vim.fn.jobstart({ "termux-clipboard-get" }, {
+--     stdout_buffered = true,
+--     on_stdout = function(_, data)
+--       if not data then return end
+--       local text = table.concat(data, "\n")
+--       if text ~= "" then
+--         vim.api.nvim_put(vim.split(text, "\n"), "c", true, true)
+--       end
+--     end,
+--   })
+-- end)
 -- vim.keymap.set("n", "<leader>p", '"+p')
 vim.keymap.set("n", "<leader>d", '"_d')
 vim.keymap.set("v", "<leader>d", '"_d')

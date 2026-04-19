@@ -49,11 +49,9 @@ git clone https://github.com/DragoonT/init-termux-neovim.git init
 mkdir -p ~/.config/nvim
 ```
 ```bash
-# 기존 설정이 있다면 백업
 [ -f ~/.config/nvim/init.lua ] && cp ~/.config/nvim/init.lua ~/.config/nvim/init.lua.bak
 ```
 ```bash
-# init.lua 다운로드
 curl -o ~/.config/nvim/init.lua https://raw.githubusercontent.com/DragoonT/init-termux-neovim/main/init.lua
 ```
 

@@ -49,11 +49,9 @@ You can install this config using only the "init.lua" file (no need to clone the
 mkdir -p ~/.config/nvim
 ```
 ```bash
-# Backup if config already exists
 [ -f ~/.config/nvim/init.lua ] && cp ~/.config/nvim/init.lua ~/.config/nvim/init.lua.bak
 ```
 ```bash
-# Download init.lua
 curl -o ~/.config/nvim/init.lua https://raw.githubusercontent.com/DragoonT/init-termux-neovim/main/init.lua
 ```
 
