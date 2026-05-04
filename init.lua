@@ -5,15 +5,11 @@ local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 local theme_file = vim.fn.stdpath("config") .. "/theme.txt"
 local created_dirs = {}
 
+-- FIX 1: On Windows, files should open in Neovim (edit), not via shell/Explorer
 local function smart_open(path)
   if not path then return end
   path = vim.fn.fnamemodify(path, ":p")
-
-  if is_windows then
-    vim.fn.jobstart({ "cmd", "/c", "start", "", path }, { detach = true })
-  else
-    vim.cmd("edit " .. vim.fn.fnameescape(path))
-  end
+  vim.cmd("edit " .. vim.fn.fnameescape(path))
 end
 
 local function smart_find(cwd)
@@ -40,10 +36,13 @@ local function smart_find(cwd)
   })
 end
 
+-- FIX 2: Add --branch=stable to lazy.nvim clone for reliability
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
+    "--filter=blob:none",
+    "--branch=stable",
     "https://github.com/folke/lazy.nvim",
     lazypath,
   })
@@ -67,7 +66,8 @@ require("lazy").setup({
 
   {
     "iamcco/markdown-preview.nvim",
-    build = "cd app && npm install",
+    -- FIX 3: Use cmd /c on Windows so npm runs correctly
+    build = is_windows and "cd app && cmd /c npm install" or "cd app && npm install",
     ft = { "markdown" },
   },
 
@@ -174,7 +174,8 @@ vim.opt.smartindent = true
 vim.opt.number = true
 vim.opt.wrap = true
 vim.opt.termguicolors = true
-vim.opt.clipboard = "unnamedplus"
+-- FIX 4: "unnamedplus" doesn't work on Windows; use "unnamed" or both
+vim.opt.clipboard = is_windows and "unnamed" or "unnamedplus"
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
