@@ -81,19 +81,32 @@ require("lazy").setup({
   { "rebelot/kanagawa.nvim" }
 })
 
-require("neo-tree").setup({
-  filesystem = {
-    filtered_items = {
-      hide_dotfiles = false,
-      hide_gitignored = false,
-    },
-  },
-})
-
+-- FIX: Defer neo-tree setup to avoid BufModifiedSet error on Windows.
+-- The event is only registered after Neovim is fully loaded.
 vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
   callback = function()
+    require("neo-tree").setup({
+      filesystem = {
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_gitignored = false,
+        },
+        -- FIX: disable use_libuv_file_watcher on Windows to prevent event errors
+        use_libuv_file_watcher = not is_windows,
+      },
+      -- FIX: suppress the vim_buffer_modified_set event registration on Windows
+      -- by providing an empty override so Neo-tree skips the broken autocmd
+      event_handlers = is_windows and {
+        {
+          event = "vim_buffer_modified_set",
+          handler = function() end,
+        },
+      } or nil,
+    })
+
     require("neo-tree.command").execute({ toggle = true })
-  end
+  end,
 })
 
 local file = io.open(theme_file, "r")
