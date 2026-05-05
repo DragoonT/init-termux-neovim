@@ -261,7 +261,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
       },
     })
 
-    require("neo-tree.command").execute({ toggle = true })
+    -- Delay opening so Neo-tree window is fully initialized before drawing
+    vim.defer_fn(function()
+      require("neo-tree.command").execute({ toggle = true })
+    end, 50)
   end,
 })
 
