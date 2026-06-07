@@ -4,6 +4,10 @@ local theme_file = vim.fn.stdpath("config") .. "/theme.txt"
 local created_dirs = {}
 local file = io.open(theme_file, "r")
 local term_buf = nil
+local clipboard = {
+  mode = nil,
+  files = {},
+}
 local function smart_open(path)
   if not path then return end
 
@@ -145,7 +149,8 @@ require("lazy").setup({
   { "EdenEast/nightfox.nvim" },
   { "navarasu/onedark.nvim" },
   { "ellisonleao/gruvbox.nvim" },
-  { "rebelot/kanagawa.nvim" }
+  { "rebelot/kanagawa.nvim" },
+  { "andweeb/presence.nvim" },
 })
 
 require("neo-tree").setup({
@@ -176,8 +181,12 @@ require("neo-tree").setup({
           "New file",
           "New folder",
           "Rename",
+          "Copy",
+          "Cut",
+          "Paste",
           "Delete",
           "Copy path",
+          "Clear clipboard",
         }, {
           prompt = "File actions:",
         }, function(choice)
@@ -189,16 +198,74 @@ require("neo-tree").setup({
             end)
           
           elseif choice == "New folder" then
-            vim.ui.input({
-              prompt = "Folder name:",
-            }, function(input)
-              if input and input ~= "" then
-                cmds.add(state, input .. "/")
-              end
-            end)
+            cmds.add_directory(state)
+            -- vim.ui.input({
+            --   prompt = "Folder name: ",
+            -- }, function(input)
+            --   if input and input ~= "" then
+            --     cmds.add_directory(state, input)
+            --   end
+            -- end)
 
           elseif choice == "Rename" then
             cmds.rename(state)
+
+          elseif choice == "Copy" then
+            local node = state.tree:get_node()
+            if node then
+              clipboard.mode = "copy"
+
+              -- avoid duplicates
+              local path = node:get_id()
+              if not vim.tbl_contains(clipboard.files, path) then
+                table.insert(clipboard.files, path)
+              end
+
+              print("Added to copy buffer: " .. node.name)
+            end
+
+          elseif choice == "Cut" then
+            local node = state.tree:get_node()
+            if node then
+              clipboard.mode = "cut"
+
+              local path = node:get_id()
+              if not vim.tbl_contains(clipboard.files, path) then
+                table.insert(clipboard.files, path)
+              end
+
+              print("Added to move buffer: " .. node.name)
+            end
+
+          elseif choice == "Paste" then
+            local target = state.tree:get_node()
+            if not target or target.type ~= "directory" then
+              print("Select a destination folder")
+              return
+            end
+
+            for _, src in ipairs(clipboard.files) do
+              local name = vim.fn.fnamemodify(src, ":t")
+              local dst = target:get_id() .. "/" .. name
+
+              if clipboard.mode == "copy" then
+                vim.fn.system({ "cp", "-R", src, dst })
+
+              elseif clipboard.mode == "cut" then
+                vim.loop.fs_rename(src, dst)
+              end
+            end
+
+            if clipboard.mode == "cut" then
+              clipboard.files = {}
+            end
+
+            require("neo-tree.sources.manager").refresh("filesystem")
+
+          elseif choice == "Clear clipboard" then
+            clipboard.files = {}
+            clipboard.mode = nil
+            print("Clipboard cleared")
 
           elseif choice == "Delete" then
             vim.ui.select({ "No", "Yes" }, {
@@ -536,4 +603,3 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
-
