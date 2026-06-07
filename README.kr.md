@@ -1,33 +1,39 @@
 # Minimal Neovim Config (Lazy.nvim)
 
-🌐 [EN](README.md) | [TH](README.th.md) | [JP](README.jp.md) | [CN](README.cn.md) | [KR](README.kr.md)
+🌐 [EN](README.md) | [TH](README_th.md) | [JP](README_jp.md) | [CN](README_cn.md) | [KR](README_kr.md)
 
-![preview](init_example.jpg)
+![preview](init_example.png)
 
-`lazy.nvim`을 사용하는 간단한 **단일 파일 Neovim 설정**입니다.
+`lazy.nvim`을 사용하는 VSCode처럼 생긴 **단일 파일 Neovim 설정**입니다.
 
 ## Features
 
 - 플러그인 매니저: lazy.nvim (자동 부트스트랩)
-- 파일 탐색기 (nvim-tree, 자동 실행)
-- Telescope (퍼지 검색)
-- 여러 테마 및 설정 유지
-- 주석(Comment) 지원
+- VSCode 스타일 다크 테마 (Carbonfox / Nightfox)
+- 파일 탐색기: Neo-tree (자동 실행, 우클릭 액션 메뉴 포함)
+- Telescope (퍼지 검색 — Ctrl+P, 명령 팔레트)
+- LSP + 자동완성 (Mason, nvim-cmp, LuaSnip) — IntelliSense 느낌
+- Treesitter 문법 하이라이팅
+- Git 사인 + 인라인 blame
+- 상태바 (lualine), 탭바 (bufferline) — VSCode 스타일
+- 통합 터미널 (toggleterm — Ctrl+\`)
+- 인라인 진단 (error-lens + lsp_lines)
+- 들여쓰기 가이드, 자동 괄호, which-key 팝업
+- Discord Rich Presence
+- 대시보드 (alpha-nvim)
+- F5 / `<Space>r` 로 현재 파일 실행
 - Nerd Font 아이콘
-
-## File Explorer
-
-- nvim-tree 사용
-- 시작 시 자동으로 열림
-- 왼쪽에 파일과 폴더 표시
 
 ---
 
 ## Requirements
 
-- Neovim >= 0.9  
-- Git  
+- Neovim >= 0.9
+- Git
 - Nerd Font (아이콘용 필수)
+- Node.js (ts_ls, html, css, json LSP용)
+- Python (pyright LSP용)
+- Rust / cargo (rust_analyzer LSP용)
 
 ---
 
@@ -41,21 +47,15 @@ git clone https://github.com/DragoonT/init-termux-neovim.git init
 
 ## Quick Install (Single File)
 
-이 설정은 "init.lua" 파일 하나만으로도 설치할 수 있습니다 (전체 repo 클론 불필요).
-
-### Install
+`init.lua` 파일 하나만으로도 설치할 수 있습니다 (전체 repo 클론 불필요).
 
 ```bash
 mkdir -p ~/.config/nvim
-```
-```bash
 [ -f ~/.config/nvim/init.lua ] && cp ~/.config/nvim/init.lua ~/.config/nvim/init.lua.bak
-```
-```bash
 curl -o ~/.config/nvim/init.lua https://raw.githubusercontent.com/DragoonT/init-termux-neovim/main/init.lua
 ```
 
-Neovim 실행
+Neovim 실행:
 
 ```bash
 nvim
@@ -69,21 +69,9 @@ nvim
 
 Termux에서 UI 문제(예: 사이드바 사라짐)를 방지하려면 `tmux` 안에서 Neovim을 실행하세요.
 
----
-
-### Install (Termux)
-
 ```bash
 pkg install tmux
-```
-
-### Usage
-```bash
 tmux
-```
-
-그 다음 Neovim 실행:
-```bash
 nvim
 ```
 
@@ -91,228 +79,220 @@ nvim
 
 ## Nerd Font (Required for Icons)
 
-이 설정은 아이콘(file tree, UI 등)을 사용하므로 **Nerd Font**가 필요합니다.
+이 설정은 아이콘을 사용하므로 **Nerd Font**가 필요합니다. 없으면 아이콘이 깨지거나 네모로 보입니다.
 
-설치하지 않으면 아이콘이 깨지거나 네모로 보일 수 있습니다.
-
-### Termux Installation
+### Termux 설치
 
 ```bash
 mkdir -p ~/.termux
-```
-```bash
 curl -L -o ~/.termux/font.ttf \
 https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Regular/FiraCodeNerdFont-Regular.ttf
-```
-```bash
 termux-reload-settings
 ```
 
-### Recommended Fonts
+### 추천 폰트
 
 - FiraCode Nerd Font
 - JetBrainsMono Nerd Font
 - Hack Nerd Font
 
-### Notes
-
-- Termux는 `~/.termux/font.ttf`만 사용합니다
-- 설치 후 설정을 다시 불러와야 합니다
-- 필요 대상:
-  - nvim-tree
-  - nvim-web-devicons
-
 ---
 
-## Themes
+## Theme
 
-- tokyonight  
-- catppuccin  
-- nightfox  
-- onedark  
-- gruvbox  
-- kanagawa  
+이 설정은 **Carbonfox** (Nightfox에서 제공) 를 사용 — VSCode 색상에 맞춘 다크 테마입니다.
 
-테마 변경:
+런타임 테마 변경:
 
 ```vim
-:colorscheme tokyonight
-```
-
----
-
-## OneDark styles
-
-OneDark 전용 명령어:
-
-```vim
-:OneDark dark
-:OneDark darker
-:OneDark cool
-:OneDark deep
-:OneDark warm
-:OneDark warmer
-```
-
-선택한 스타일은 자동으로 저장되고 재시작 시 복원됩니다.
-
----
-
-## Fuzzy Finder
-
-- Telescope 설치 및 사용 가능
-
-예시:
-
-```vim
-:Telescope find_files
-```
-
-- 테마 변경
-
-```vim
+:colorscheme carbonfox
+:colorscheme nightfox
 :Telescope colorscheme
 ```
 
 ---
 
-## How it works
+## 파일 탐색기 (Neo-tree)
 
-- `lazy.nvim`이 자동으로 부트스트랩됨 (수동 설치 불필요)
-- 테마는 다음 위치에 저장됨:
+- 시작 시 자동으로 열림 (왼쪽 사이드바, 너비 30)
+- 파일/폴더에서 `<Space>` 를 눌러 액션 메뉴 열기:
+  - 새 파일 / 새 폴더
+  - 이름 변경
+  - 복사 / 잘라내기 / 붙여넣기
+  - 삭제 (확인 필요)
+  - 경로 복사
 
-```bash
-~/.config/nvim/theme.txt
-```
-
-- 설정은 하나의 `init.lua` 파일에 모두 포함됨
-
----
-
-# Which-Key Support
-
-## Keybindings
-
-> Leader key = `Space`
+| 키 | 기능 |
+|----|------|
+| `<leader>e` / `<C-b>` | Neo-tree 토글 |
+| `<Space>` (트리 내) | 액션 메뉴 열기 |
 
 ---
 
-### Find Files
-- `<Space>f` → 파일 찾기  
-- `<Space>ff` → 프로젝트 전체 검색 (Telescope)
+## LSP & 자동완성
+
+**Mason** 으로 관리. 아래 언어 서버가 자동 설치됩니다:
+
+| 언어 | 서버 |
+|------|------|
+| Lua | lua_ls |
+| JavaScript / TypeScript | ts_ls |
+| Python | pyright |
+| CSS | cssls |
+| HTML | html |
+| JSON | jsonls |
+| Rust | rust_analyzer |
+
+### LSP 단축키
+
+| 키 | 기능 |
+|----|------|
+| `gd` | 정의로 이동 |
+| `gD` | 선언으로 이동 |
+| `gr` | 참조 보기 |
+| `gi` | 구현으로 이동 |
+| `K` | 호버 문서 |
+| `<leader>rn` | 심볼 이름 변경 |
+| `<leader>ca` | 코드 액션 |
+| `<leader>f` | 파일 포맷 |
+| `[d` / `]d` | 이전/다음 진단 |
+| `<leader>e` | 진단 플로트 표시 |
+
+### 자동완성
+
+| 키 | 기능 |
+|----|------|
+| `<Tab>` | 다음 항목 / 스니펫 확장 |
+| `<S-Tab>` | 이전 항목 |
+| `<CR>` | 선택 확정 |
+| `<C-Space>` | 완성 트리거 |
+| `<C-e>` | 취소 |
 
 ---
 
-## Navigation & Editing
+## Telescope (퍼지 검색)
 
-### Improved Copy Behavior
-
-- `y` → 선택 유지 상태로 복사
-
-> yank 후에도 선택이 유지되어 빠르게 작업 가능
-
----
-
-## Delete vs Cut (Custom Behavior)
-
-기본적으로 Neovim은 **삭제 = 잘라내기**로 동작합니다:
-- `d` → 텍스트 삭제 + 레지스터에 저장
-- 이후 `p`로 붙여넣기 가능
-
-### Custom Delete (No Clipboard)
-
-이 설정은 VSCode처럼 **진짜 삭제 기능**을 추가합니다:
-
-- `<Space>d` → 저장 없이 삭제
-- `d` → 기존처럼 cut 유지
-
-### Configuration
-
-```lua
--- 클립보드에 저장하지 않고 삭제
-vim.keymap.set("n", "<leader>d", '"_d')
-vim.keymap.set("v", "<leader>d", '"_d')
-```
-
-### Summary
-
-| Key | Action |
-|-----|--------|
-| `d` | Cut (삭제 + 저장) |
-| `<Space>d` | Delete (저장 안함) |
-| `p` | Paste |
-
-> 삭제 시 클립보드가 덮어쓰이지 않도록 도와줍니다.
+| 키 | 기능 |
+|----|------|
+| `<C-p>` | 파일 찾기 |
+| `<C-S-p>` | 명령 팔레트 |
+| `<leader>fg` | 라이브 grep |
+| `<leader>fb` | 버퍼 목록 |
+| `<leader>fd` | 진단 |
+| `<leader>fr` | 최근 파일 |
+| `<leader>ff` | 프로젝트 전체 텍스트 검색 |
+| `<leader>fa` | 홈 디렉토리 전체 파일 검색 |
+| `<leader>fs` | 현재 파일 폴더에서 검색 |
+| `<leader>th` | 컬러스킴 목록 |
+| `<leader>vc` | nvim 설정 내 검색 |
 
 ---
 
-### Indentation (Improved)
+## 코드 실행 (F5 / `<Space>r`)
 
-- `<` → 왼쪽 이동  
-- `>` → 오른쪽 이동  
+`<F5>`, `<C-F5>`, 또는 `<leader>r` 을 눌러 **현재 파일** 을 터미널에서 실행합니다.
 
-> 기본(2~4칸) 대신 **1칸 단위**로 이동  
-> 선택 상태 유지됨
+지원 파일 타입:
 
----
-
-### Comment
-- `gcc` → 줄 주석 토글  
-- `gc` → 선택 영역 주석 토글  
-
----
-
-### Telescope
-- `<Space>f` → 파일 찾기  
-- `:Telescope find_files` → 직접 실행  
-
----
-
-## Run Code
-
-`<Space>r`을 눌러 프로젝트 실행 파일(`app2.py`)을 터미널에서 실행합니다
-
-> 참고: 현재 파일이 아닌 항상 `app2.py`를 실행합니다
-
-![run_code_preview](run_code_example.jpg)
-
-## Optional: Run Current File (Fallback to app2.py)
-
-현재 파일을 실행하도록 변경하려면 아래 코드로 교체하세요:
-
-```lua
-vim.keymap.set("n", "<leader>r", function()
-  vim.cmd("w")
-
-  local app = "app2.py"
-  if vim.fn.filereadable(app) == 1 then
-    vim.cmd("terminal python " .. app)
-  else
-    vim.cmd("terminal python %")
-  end
-end)
-```
+| 파일 타입 | 실행 방법 |
+|-----------|-----------|
+| Python | `python file.py` |
+| JavaScript | `node file.js` |
+| TypeScript / TSX | `npx ts-node file.ts` |
+| Lua | `lua file.lua` |
+| Bash / sh | `bash file.sh` |
+| PowerShell | `powershell -File file.ps1` |
+| Rust | `cargo run` |
+| Go | `go run file.go` |
+| C | `gcc` → 출력 실행 |
+| C++ | `g++` → 출력 실행 |
+| Java | `javac` → `java` |
+| PHP | `php file.php` |
+| Ruby | `ruby file.rb` |
 
 ---
 
-### Notes
-- Leader 키는 `Space` 사용  
-- 속도와 단순함 중심 설계
+## 터미널 (Toggleterm)
+
+| 키 | 기능 |
+|----|------|
+| `<C-\`>` | 터미널 토글 |
+| `<leader>t1/t2/t3` | 터미널 1/2/3 |
+| `<Esc>` (터미널 내) | 노멀 모드로 |
 
 ---
 
-## Plugin Management
+## 탐색 & 편집
+
+### 저장 / 종료
+
+| 키 | 기능 |
+|----|------|
+| `<C-s>` | 저장 |
+| `<leader>q` / `<C-q>` | 전체 종료 |
+| `<leader>wq` | 전체 저장 후 종료 |
+
+### 되돌리기 / 다시 실행
+
+| 키 | 기능 |
+|----|------|
+| `<C-z>` | 되돌리기 |
+| `<C-y>` | 다시 실행 |
+
+### 복사 / 붙여넣기 / 삭제
+
+| 키 | 기능 |
+|----|------|
+| `y` | 복사 (선택 유지) |
+| `<C-c>` (비주얼) | 시스템 클립보드로 복사 |
+| `<C-v>` | 시스템 클립보드에서 붙여넣기 |
+| `<leader>d` | 클립보드 영향 없이 삭제 |
+| `d` | 잘라내기 (삭제 + 레지스터 저장) |
+
+### 기타
+
+| 키 | 기능 |
+|----|------|
+| `<C-a>` / `<leader>a` | 전체 선택 |
+| `<C-w>` | 버퍼 닫기 |
+| `<A-Up>` / `<A-Down>` | 줄 위/아래 이동 |
+| `<A-S-Down>` | 줄 복제 |
+| `<C-/>` | 주석 토글 |
+| `<Tab>` / `<S-Tab>` (비주얼) | 들여쓰기 증가/감소 |
+| `<C-h/j/k/l>` | 분할 창 이동 |
+| `<C-Tab>` / `<C-S-Tab>` | 다음/이전 버퍼 탭 |
+| `<Esc>` | 검색 하이라이트 지우기 |
+
+---
+
+## Git (Gitsigns)
+
+- 추가 / 수정 / 삭제 줄의 거터 사인
+- 현재 줄 인라인 git blame (500ms 지연)
+- 형식: `작성자, YYYY-MM-DD - 요약`
+
+---
+
+## 플러그인 관리
 
 ```vim
-:Lazy update  " 플러그인 업데이트
-:Lazy clean   " 사용하지 않는 플러그인 삭제
-:Lazy sync    " 누락된 플러그인 설치
+:Lazy update   " 플러그인 업데이트
+:Lazy clean    " 사용하지 않는 플러그인 삭제
+:Lazy sync     " 누락된 플러그인 설치
 ```
 
 ---
 
-## Reset
+## 초기화
 
 ```bash
 rm -rf ~/.local/share/nvim
 ```
+
+---
+
+## Windows 지원
+
+Windows에서 자동으로:
+- PowerShell을 셸로 설정
+- `win32yank.exe`로 클립보드 연동

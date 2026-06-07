@@ -1,33 +1,39 @@
 # Minimal Neovim Config (Lazy.nvim)
 
-🌐 [EN](README.md) | [TH](README.th.md) | [JP](README.jp.md) | [CN](README.cn.md) | [KR](README.kr.md)
+🌐 [EN](README.md) | [TH](README_th.md) | [JP](README_jp.md) | [CN](README_cn.md) | [KR](README_kr.md)
 
-![preview](init_example.jpg)
+![preview](init_example.png)
 
-A simple **single-file Neovim configuration** using `lazy.nvim`.
+A powerful **single-file Neovim configuration** using `lazy.nvim` — designed to look and feel like VSCode.
 
 ## Features
 
 - Plugin manager: lazy.nvim (auto bootstrap)
-- File explorer (nvim-tree, auto opens)
-- Telescope (fuzzy finder)
-- Multiple themes with persistence
-- Comment support
+- VSCode-like dark theme (Carbonfox / Nightfox)
+- File explorer: Neo-tree (auto opens, with right-click action menu)
+- Telescope (fuzzy finder — Ctrl+P, Command Palette)
+- LSP + Autocomplete (Mason, nvim-cmp, LuaSnip) — IntelliSense feel
+- Treesitter syntax highlighting
+- Git signs with inline blame
+- Statusline (lualine) and tabline (bufferline) — VSCode style
+- Integrated terminal (toggleterm — Ctrl+\`)
+- Inline diagnostics (error-lens + lsp_lines)
+- Indent guides, auto pairs, which-key popup
+- Discord Rich Presence
+- Dashboard (alpha-nvim)
+- Run current file with F5 / `<Space>r`
 - Nerd Font icons
-
-## File Explorer
-
-- Uses nvim-tree
-- Opens automatically on startup
-- Shows files and folders on the left
 
 ---
 
 ## Requirements
 
-- Neovim >= 0.9  
-- Git  
+- Neovim >= 0.9
+- Git
 - Nerd Font (required for icons)
+- Node.js (for ts_ls, html, css, json LSP)
+- Python (for pyright LSP)
+- Rust / cargo (for rust_analyzer LSP)
 
 ---
 
@@ -41,7 +47,7 @@ git clone https://github.com/DragoonT/init-termux-neovim.git init
 
 ## Quick Install (Single File)
 
-You can install this config using only the "init.lua" file (no need to clone the full repo).
+You can install this config using only the `init.lua` file (no need to clone the full repo).
 
 ### Install
 
@@ -55,7 +61,7 @@ mkdir -p ~/.config/nvim
 curl -o ~/.config/nvim/init.lua https://raw.githubusercontent.com/DragoonT/init-termux-neovim/main/init.lua
 ```
 
-Start Neovim
+Start Neovim:
 
 ```bash
 nvim
@@ -69,8 +75,6 @@ Plugins will install automatically on first launch.
 
 Run Neovim inside `tmux` to avoid UI issues in Termux (e.g. sidebar disappearing).
 
----
-
 ### Install (Termux)
 
 ```bash
@@ -78,12 +82,9 @@ pkg install tmux
 ```
 
 ### Usage
+
 ```bash
 tmux
-```
-
-Then run Neovim:
-```bash
 nvim
 ```
 
@@ -99,12 +100,8 @@ Without it, icons will look like squares or broken symbols.
 
 ```bash
 mkdir -p ~/.termux
-```
-```bash
 curl -L -o ~/.termux/font.ttf \
 https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Regular/FiraCodeNerdFont-Regular.ttf
-```
-```bash
 termux-reload-settings
 ```
 
@@ -118,57 +115,22 @@ termux-reload-settings
 
 - Termux ONLY uses: `~/.termux/font.ttf`
 - You must reload settings after installing
-- Required for:
-  - nvim-tree
-  - nvim-web-devicons
+- Required for: Neo-tree, nvim-web-devicons, lualine, bufferline
 
 ---
 
-## Themes
+## Theme
 
-- tokyonight  
-- catppuccin  
-- nightfox  
-- onedark  
-- gruvbox  
-- kanagawa  
+This config uses **Carbonfox** (from Nightfox) — a VSCode dark theme with matching colors for keywords, strings, variables, and UI elements.
 
-Change theme:
+Change theme at runtime:
 
 ```vim
-:colorscheme tokyonight
+:colorscheme nightfox
+:colorscheme carbonfox
 ```
 
----
-
-## OneDark styles
-
-Special command for OneDark:
-
-```vim
-:OneDark dark
-:OneDark darker
-:OneDark cool
-:OneDark deep
-:OneDark warm
-:OneDark warmer
-```
-
-Selected style is saved automatically and restored on restart.
-
----
-
-## Fuzzy Finder
-
-- Telescope installed and ready
-
-Example:
-
-```vim
-:Telescope find_files
-```
-
-- Change themes
+The active colorscheme can also be browsed with Telescope:
 
 ```vim
 :Telescope colorscheme
@@ -176,137 +138,177 @@ Example:
 
 ---
 
-## How it works
+## File Explorer (Neo-tree)
 
-- `lazy.nvim` bootstraps automatically (no manual install needed)
-- Theme is saved in:
+- Opens automatically on startup (left sidebar, width 30)
+- Press `<Space>` on any file/folder for an action menu:
+  - New file / New folder
+  - Rename
+  - Copy / Cut / Paste
+  - Delete (with confirmation)
+  - Copy path
 
-```bash
-~/.config/nvim/theme.txt
-```
+### Keybindings
 
-- Config is fully contained in one `init.lua` file
-
----
-
-# Which-Key Support
-
-## Keybindings
-
-> Leader key = `Space`
+| Key | Action |
+|-----|--------|
+| `<leader>e` / `<C-b>` | Toggle Neo-tree |
+| `<Space>` (in tree) | Open action menu |
 
 ---
 
-### Find Files
-- `<Space>f` → Find files  
-- `<Space>ff` → Find files in project (Telescope)
+## LSP & Autocomplete
+
+Managed by **Mason**. The following language servers are auto-installed:
+
+| Language | Server |
+|----------|--------|
+| Lua | lua_ls |
+| JavaScript / TypeScript | ts_ls |
+| Python | pyright |
+| CSS | cssls |
+| HTML | html |
+| JSON | jsonls |
+| Rust | rust_analyzer |
+
+### LSP Keybindings
+
+| Key | Action |
+|-----|--------|
+| `gd` | Go to Definition |
+| `gD` | Go to Declaration |
+| `gr` | Go to References |
+| `gi` | Go to Implementation |
+| `K` | Hover Docs |
+| `<leader>rn` | Rename Symbol |
+| `<leader>ca` | Code Action |
+| `<leader>f` | Format File |
+| `[d` / `]d` | Prev / Next Diagnostic |
+| `<leader>e` | Show Diagnostic Float |
+
+### Autocomplete
+
+| Key | Action |
+|-----|--------|
+| `<Tab>` | Next item / expand snippet |
+| `<S-Tab>` | Prev item |
+| `<CR>` | Confirm selection |
+| `<C-Space>` | Trigger completion |
+| `<C-e>` | Abort |
+
+---
+
+## Telescope (Fuzzy Finder)
+
+| Key | Action |
+|-----|--------|
+| `<C-p>` | Find files |
+| `<C-S-p>` | Command palette |
+| `<leader>fg` | Live grep |
+| `<leader>fb` | Buffers |
+| `<leader>fd` | Diagnostics |
+| `<leader>fr` | Recent files |
+| `<leader>ff` | Find text in project |
+| `<leader>fa` | Find all files (home dir) |
+| `<leader>fs` | Find files from current file's folder |
+| `<leader>th` | Browse colorschemes |
+| `<leader>vc` | Find in nvim config |
+
+---
+
+## Run Code (F5 / `<Space>r`)
+
+Press `<F5>`, `<C-F5>`, or `<leader>r` to run the **current file** in a terminal split.
+
+Supported filetypes:
+
+| Filetype | Runner |
+|----------|--------|
+| Python | `python file.py` |
+| JavaScript | `node file.js` |
+| TypeScript / TSX | `npx ts-node file.ts` |
+| Lua | `lua file.lua` |
+| Bash / sh | `bash file.sh` |
+| PowerShell | `powershell -File file.ps1` |
+| Rust | `cargo run` |
+| Go | `go run file.go` |
+| C | `gcc` → run output |
+| C++ | `g++` → run output |
+| Java | `javac` → `java` |
+| PHP | `php file.php` |
+| Ruby | `ruby file.rb` |
+
+---
+
+## Terminal (Toggleterm)
+
+| Key | Action |
+|-----|--------|
+| `<C-\`` >` | Toggle terminal |
+| `<leader>t1` | Terminal 1 |
+| `<leader>t2` | Terminal 2 |
+| `<leader>t3` | Terminal 3 |
+| `<Esc>` (in terminal) | Exit to normal mode |
 
 ---
 
 ## Navigation & Editing
 
-### Improved Copy Behavior
-
-- `y` → Copy without losing selection
-
-> Keeps visual selection after yank for faster editing
-
----
-
-## Delete vs Cut (Custom Behavior)
-
-By default, Neovim treats **delete as cut**:
-- `d` → deletes text **and saves it to clipboard/register**
-- You can paste it later with `p`
-
-### Custom Delete (No Clipboard)
-
-This config adds a true **delete** behavior (like VSCode):
-
-- `<Space>d` → delete text **without saving**
-- `d` → still works as cut (default behavior)
-
-### Configuration
-
-```lua
--- Delete without affecting clipboard
-vim.keymap.set("n", "<leader>d", '"_d')
-vim.keymap.set("v", "<leader>d", '"_d')
-```
-
-### Summary
+### Save / Quit
 
 | Key | Action |
 |-----|--------|
-| `d` | Cut (delete + save) |
-| `<Space>d` | Delete (no save) |
-| `p` | Paste |
+| `<C-s>` | Save |
+| `<leader>q` / `<C-q>` | Quit all |
+| `<leader>wq` | Save all and quit |
 
-> This helps prevent overwriting your clipboard when deleting text.
+### Undo / Redo
 
----
+| Key | Action |
+|-----|--------|
+| `<C-z>` | Undo |
+| `<C-y>` | Redo |
 
-### Indentation (Improved)
+### Copy / Paste / Delete
 
-- `<` → Shift left  
-- `>` → Shift right  
+| Key | Action |
+|-----|--------|
+| `y` | Copy (keeps visual selection) |
+| `<C-c>` (visual) | Copy to system clipboard |
+| `<C-v>` | Paste from system clipboard |
+| `<leader>d` | Delete without affecting clipboard |
+| `d` | Cut (delete + save to register) |
 
-> Indents by **1 space** instead of default (2–4 spaces)  
-> Keeps selection after indent (no need to reselect)
+### Other
 
----
-
-### Comment
-- `gcc` → Toggle comment (line)  
-- `gc` → Toggle comment (visual selection)
-
----
-
-### Telescope
-- `<Space>f` → Find files  
-- `:Telescope find_files` → Manual command  
-
----
-
-## Run Code
-
-Press `<Space>r` to execute the project entry file (`app2.py`) in a terminal
-
-> Note: This does not run the current file — it always runs `app2.py`
-
-![run_code_preview](run_code_example.jpg)
-
-## Optional: Run Current File (Fallback to app2.py)
-
-If you want `<Space>r` to run the current file instead, you can replace the keybinding with this:
-
-```lua
-vim.keymap.set("n", "<leader>r", function()
-  vim.cmd("w")
-
-  local app = "app2.py"
-  if vim.fn.filereadable(app) == 1 then
-    vim.cmd("terminal python " .. app)
-  else
-    vim.cmd("terminal python %")
-  end
-end)
-```
+| Key | Action |
+|-----|--------|
+| `<C-a>` / `<leader>a` | Select all |
+| `<C-w>` | Close buffer |
+| `<A-Up>` / `<A-Down>` | Move line up/down |
+| `<A-S-Down>` | Duplicate line |
+| `<C-/>` | Toggle comment |
+| `<Tab>` / `<S-Tab>` (visual) | Indent / De-indent |
+| `<C-h/j/k/l>` | Navigate splits |
+| `<C-Tab>` / `<C-S-Tab>` | Next / Prev buffer tab |
+| `<Esc>` | Clear search highlight |
 
 ---
 
-### Notes
-- Uses `Space` as leader key  
-- Designed for speed and simplicity
+## Git (Gitsigns)
+
+- Gutter signs for added / changed / deleted lines
+- Inline git blame on current line (500ms delay)
+- Format: `author, YYYY-MM-DD - summary`
 
 ---
 
 ## Plugin Management
 
 ```vim
-:Lazy update  " update plugins
-:Lazy clean   " remove unused plugins
-:Lazy sync    " install missing plugins
+:Lazy update   " update plugins
+:Lazy clean    " remove unused plugins
+:Lazy sync     " install missing plugins
 ```
 
 ---
@@ -316,3 +318,11 @@ end)
 ```bash
 rm -rf ~/.local/share/nvim
 ```
+
+---
+
+## Windows Support
+
+On Windows, the config automatically:
+- Sets PowerShell as the shell
+- Uses `win32yank.exe` for clipboard integration

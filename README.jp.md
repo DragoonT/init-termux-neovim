@@ -1,33 +1,39 @@
 # Minimal Neovim Config (Lazy.nvim)
 
-🌐 [EN](README.md) | [TH](README.th.md) | [JP](README.jp.md) | [CN](README.cn.md) | [KR](README.kr.md)
+🌐 [EN](README.md) | [TH](README_th.md) | [JP](README_jp.md) | [CN](README_cn.md) | [KR](README_kr.md)
 
-![preview](init_example.jpg)
+![preview](init_example.png)
 
-`lazy.nvim`を使用したシンプルな**単一ファイルのNeovim設定**です。
+`lazy.nvim` を使用した、VSCode ライクな見た目と操作感の**単一ファイル Neovim 設定**です。
 
 ## Features
 
 - プラグインマネージャー: lazy.nvim（自動ブートストラップ）
-- ファイルエクスプローラー（nvim-tree、自動起動）
-- Telescope（ファジーファインダー）
-- 複数テーマ対応（設定を保持）
-- コメント機能
+- VSCode風ダークテーマ（Carbonfox / Nightfox）
+- ファイルエクスプローラー: Neo-tree（自動起動、右クリック操作メニュー付き）
+- Telescope（ファジーファインダー — Ctrl+P、コマンドパレット）
+- LSP + 自動補完（Mason、nvim-cmp、LuaSnip）— IntelliSense 体験
+- Treesitter シンタックスハイライト
+- Gitサイン + 行内 blame
+- ステータスライン（lualine）とタブライン（bufferline）— VSCode スタイル
+- 統合ターミナル（toggleterm — Ctrl+\`）
+- インライン診断（error-lens + lsp_lines）
+- インデントガイド、自動括号補完、which-key ポップアップ
+- Discord Rich Presence
+- ダッシュボード（alpha-nvim）
+- F5 / `<Space>r` で現在のファイルを実行
 - Nerd Font アイコン
-
-## File Explorer
-
-- nvim-treeを使用
-- 起動時に自動で開く
-- 左側にファイルとフォルダを表示
 
 ---
 
 ## Requirements
 
-- Neovim >= 0.9  
-- Git  
+- Neovim >= 0.9
+- Git
 - Nerd Font（アイコン用・必須）
+- Node.js（ts_ls、html、css、json LSP用）
+- Python（pyright LSP用）
+- Rust / cargo（rust_analyzer LSP用）
 
 ---
 
@@ -41,21 +47,15 @@ git clone https://github.com/DragoonT/init-termux-neovim.git init
 
 ## Quick Install (Single File)
 
-この設定は "init.lua" ファイル1つだけでもインストールできます（リポジトリ全体のクローンは不要）。
-
-### Install
+`init.lua` ファイル1つだけでインストールできます（リポジトリ全体のクローン不要）。
 
 ```bash
 mkdir -p ~/.config/nvim
-```
-```bash
 [ -f ~/.config/nvim/init.lua ] && cp ~/.config/nvim/init.lua ~/.config/nvim/init.lua.bak
-```
-```bash
 curl -o ~/.config/nvim/init.lua https://raw.githubusercontent.com/DragoonT/init-termux-neovim/main/init.lua
 ```
 
-Neovimを起動
+Neovimを起動：
 
 ```bash
 nvim
@@ -69,21 +69,9 @@ nvim
 
 TermuxでのUI問題（例：サイドバーが消える）を防ぐため、`tmux` 内でNeovimを実行してください。
 
----
-
-### Install (Termux)
-
 ```bash
 pkg install tmux
-```
-
-### Usage
-```bash
 tmux
-```
-
-その後Neovimを起動：
-```bash
 nvim
 ```
 
@@ -91,228 +79,220 @@ nvim
 
 ## Nerd Font (Required for Icons)
 
-この設定ではアイコン（ファイルツリー、UIなど）を使用するため、**Nerd Font** が必要です。
+この設定ではアイコンを使用するため、**Nerd Font** が必要です。未インストールの場合、アイコンが四角や壊れた記号になります。
 
-未インストールの場合、アイコンが四角や壊れた記号のように表示されます。
-
-### Termux Installation
+### Termux インストール
 
 ```bash
 mkdir -p ~/.termux
-```
-```bash
 curl -L -o ~/.termux/font.ttf \
 https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/FiraCode/Regular/FiraCodeNerdFont-Regular.ttf
-```
-```bash
 termux-reload-settings
 ```
 
-### Recommended Fonts
+### 推奨フォント
 
 - FiraCode Nerd Font
 - JetBrainsMono Nerd Font
 - Hack Nerd Font
 
-### Notes
-
-- Termuxは `~/.termux/font.ttf` のみ使用します
-- インストール後は設定の再読み込みが必要です
-- 必要な機能：
-  - nvim-tree
-  - nvim-web-devicons
-
 ---
 
-## Themes
+## Theme
 
-- tokyonight  
-- catppuccin  
-- nightfox  
-- onedark  
-- gruvbox  
-- kanagawa  
+この設定では **Carbonfox**（Nightfox より）を使用 — VSCodeのカラーに合わせたダークテーマです。
 
-テーマ変更：
+実行時にテーマを変更：
 
 ```vim
-:colorscheme tokyonight
-```
-
----
-
-## OneDark styles
-
-OneDark用の特別コマンド：
-
-```vim
-:OneDark dark
-:OneDark darker
-:OneDark cool
-:OneDark deep
-:OneDark warm
-:OneDark warmer
-```
-
-選択したスタイルは自動的に保存され、再起動時に復元されます。
-
----
-
-## Fuzzy Finder
-
-- Telescopeはインストール済みですぐ使えます
-
-例：
-
-```vim
-:Telescope find_files
-```
-
-- テーマ変更
-
-```vim
+:colorscheme carbonfox
+:colorscheme nightfox
 :Telescope colorscheme
 ```
 
 ---
 
-## How it works
+## ファイルエクスプローラー（Neo-tree）
 
-- `lazy.nvim` は自動でブートストラップされます（手動インストール不要）
-- テーマは以下に保存されます：
+- 起動時に自動で開く（左サイドバー、幅30）
+- ファイル/フォルダ上で `<Space>` を押してアクションメニューを開く：
+  - 新しいファイル / 新しいフォルダ
+  - 名前変更
+  - コピー / カット / ペースト
+  - 削除（確認あり）
+  - パスをコピー
 
-```bash
-~/.config/nvim/theme.txt
-```
-
-- 設定はすべて1つの `init.lua` にまとめられています
-
----
-
-# Which-Key Support
-
-## Keybindings
-
-> Leader key = `Space`
+| キー | アクション |
+|------|-----------|
+| `<leader>e` / `<C-b>` | Neo-tree 切り替え |
+| `<Space>`（ツリー内） | アクションメニューを開く |
 
 ---
 
-### Find Files
-- `<Space>f` → ファイル検索  
-- `<Space>ff` → プロジェクト全体検索（Telescope）
+## LSP & 自動補完
+
+**Mason** で管理。以下の言語サーバーが自動インストールされます：
+
+| 言語 | サーバー |
+|------|---------|
+| Lua | lua_ls |
+| JavaScript / TypeScript | ts_ls |
+| Python | pyright |
+| CSS | cssls |
+| HTML | html |
+| JSON | jsonls |
+| Rust | rust_analyzer |
+
+### LSP キーバインド
+
+| キー | アクション |
+|------|-----------|
+| `gd` | 定義へジャンプ |
+| `gD` | 宣言へジャンプ |
+| `gr` | 参照を表示 |
+| `gi` | 実装へジャンプ |
+| `K` | ホバードキュメント |
+| `<leader>rn` | シンボルの名前変更 |
+| `<leader>ca` | コードアクション |
+| `<leader>f` | ファイルをフォーマット |
+| `[d` / `]d` | 前/次の診断 |
+| `<leader>e` | 診断フロートを表示 |
+
+### 自動補完
+
+| キー | アクション |
+|------|-----------|
+| `<Tab>` | 次の項目 / スニペット展開 |
+| `<S-Tab>` | 前の項目 |
+| `<CR>` | 選択を確定 |
+| `<C-Space>` | 補完をトリガー |
+| `<C-e>` | 中止 |
 
 ---
 
-## Navigation & Editing
+## Telescope（ファジーファインダー）
 
-### Improved Copy Behavior
-
-- `y` → 選択を維持したままコピー
-
-> yank後も選択が維持されるため、効率よく編集できます
-
----
-
-## Delete vs Cut (Custom Behavior)
-
-デフォルトでは、Neovimは**削除 = カット**として動作します：
-- `d` → テキストを削除し、レジスタに保存
-- `p` で貼り付け可能
-
-### Custom Delete (No Clipboard)
-
-この設定ではVSCodeのような**本当の削除**を追加します：
-
-- `<Space>d` → 保存せず削除
-- `d` → 従来通りカット
-
-### Configuration
-
-```lua
--- クリップボードに保存せず削除
-vim.keymap.set("n", "<leader>d", '"_d')
-vim.keymap.set("v", "<leader>d", '"_d')
-```
-
-### Summary
-
-| Key | Action |
-|-----|--------|
-| `d` | Cut（削除＋保存） |
-| `<Space>d` | Delete（保存なし） |
-| `p` | Paste |
-
-> 削除時にクリップボードが上書きされるのを防ぎます。
+| キー | アクション |
+|------|-----------|
+| `<C-p>` | ファイル検索 |
+| `<C-S-p>` | コマンドパレット |
+| `<leader>fg` | ライブ grep |
+| `<leader>fb` | バッファ一覧 |
+| `<leader>fd` | 診断 |
+| `<leader>fr` | 最近のファイル |
+| `<leader>ff` | プロジェクト内テキスト検索 |
+| `<leader>fa` | ホームの全ファイル検索 |
+| `<leader>fs` | 現在のファイルのフォルダから検索 |
+| `<leader>th` | カラースキーム一覧 |
+| `<leader>vc` | nvim設定内を検索 |
 
 ---
 
-### Indentation (Improved)
+## コード実行（F5 / `<Space>r`）
 
-- `<` → 左に移動  
-- `>` → 右に移動  
+`<F5>`、`<C-F5>`、または `<leader>r` を押すと、**現在のファイル**がターミナルで実行されます。
 
-> デフォルト（2〜4スペース）ではなく**1スペース単位**でインデント  
-> 選択状態を維持
+対応ファイルタイプ：
 
----
-
-### Comment
-- `gcc` → 行コメント切り替え  
-- `gc` → 選択範囲コメント切り替え  
-
----
-
-### Telescope
-- `<Space>f` → ファイル検索  
-- `:Telescope find_files` → 手動実行  
-
----
-
-## Run Code
-
-`<Space>r` を押すと、プロジェクトの実行ファイル（`app2.py`）をターミナルで実行します
-
-> 注意：現在のファイルではなく、常に `app2.py` を実行します
-
-![run_code_preview](run_code_example.jpg)
-
-## Optional: Run Current File (Fallback to app2.py)
-
-現在のファイルを実行したい場合は、以下のようにキーマップを変更してください：
-
-```lua
-vim.keymap.set("n", "<leader>r", function()
-  vim.cmd("w")
-
-  local app = "app2.py"
-  if vim.fn.filereadable(app) == 1 then
-    vim.cmd("terminal python " .. app)
-  else
-    vim.cmd("terminal python %")
-  end
-end)
-```
+| ファイルタイプ | 実行方法 |
+|--------------|---------|
+| Python | `python file.py` |
+| JavaScript | `node file.js` |
+| TypeScript / TSX | `npx ts-node file.ts` |
+| Lua | `lua file.lua` |
+| Bash / sh | `bash file.sh` |
+| PowerShell | `powershell -File file.ps1` |
+| Rust | `cargo run` |
+| Go | `go run file.go` |
+| C | `gcc` → 出力を実行 |
+| C++ | `g++` → 出力を実行 |
+| Java | `javac` → `java` |
+| PHP | `php file.php` |
+| Ruby | `ruby file.rb` |
 
 ---
 
-### Notes
-- Leaderキーは `Space` を使用  
-- シンプルさと高速性を重視
+## ターミナル（Toggleterm）
+
+| キー | アクション |
+|------|-----------|
+| `<C-\`>` | ターミナル切り替え |
+| `<leader>t1/t2/t3` | ターミナル 1/2/3 |
+| `<Esc>`（ターミナル内） | ノーマルモードへ |
 
 ---
 
-## Plugin Management
+## ナビゲーション & 編集
+
+### 保存 / 終了
+
+| キー | アクション |
+|------|-----------|
+| `<C-s>` | 保存 |
+| `<leader>q` / `<C-q>` | 全て終了 |
+| `<leader>wq` | 全て保存して終了 |
+
+### アンドゥ / リドゥ
+
+| キー | アクション |
+|------|-----------|
+| `<C-z>` | アンドゥ |
+| `<C-y>` | リドゥ |
+
+### コピー / ペースト / 削除
+
+| キー | アクション |
+|------|-----------|
+| `y` | コピー（選択を維持） |
+| `<C-c>`（ビジュアル） | システムクリップボードへコピー |
+| `<C-v>` | システムクリップボードからペースト |
+| `<leader>d` | クリップボードに影響しない削除 |
+| `d` | カット（削除 + レジスタ保存） |
+
+### その他
+
+| キー | アクション |
+|------|-----------|
+| `<C-a>` / `<leader>a` | 全選択 |
+| `<C-w>` | バッファを閉じる |
+| `<A-Up>` / `<A-Down>` | 行を上/下へ移動 |
+| `<A-S-Down>` | 行を複製 |
+| `<C-/>` | コメントの切り替え |
+| `<Tab>` / `<S-Tab>`（ビジュアル） | インデント増/減 |
+| `<C-h/j/k/l>` | スプリット間を移動 |
+| `<C-Tab>` / `<C-S-Tab>` | 次/前のバッファタブ |
+| `<Esc>` | 検索ハイライトをクリア |
+
+---
+
+## Git（Gitsigns）
+
+- 追加 / 変更 / 削除行のガターサイン
+- 現在行のインライン git blame（500ms 遅延）
+- 形式：`著者, YYYY-MM-DD - コミット概要`
+
+---
+
+## プラグイン管理
 
 ```vim
-:Lazy update  " プラグインを更新
-:Lazy clean   " 未使用のプラグインを削除
-:Lazy sync    " 不足しているプラグインをインストール
+:Lazy update   " プラグインを更新
+:Lazy clean    " 未使用プラグインを削除
+:Lazy sync     " 不足プラグインをインストール
 ```
 
 ---
 
-## Reset
+## リセット
 
 ```bash
 rm -rf ~/.local/share/nvim
 ```
+
+---
+
+## Windows サポート
+
+Windowsでは自動的に：
+- PowerShell をシェルとして設定
+- `win32yank.exe` でクリップボード連携
