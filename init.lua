@@ -154,32 +154,31 @@ require("lazy").setup({
 
   -- ── 3. DISCORD PRESENCE (via presence.nvim) ──────────────
   {
-    "andweeb/presence.nvim",
+    "vyfor/cord.nvim",
+    build = ":Cord update",
     event = "VeryLazy",
-    config = function()
-      require("presence").setup({
-        auto_update        = true,
-        neovim_image_text  = "The One True Editor",
-        main_image         = "neovim",
-        client_id          = "793271441293967371",
-        log_level          = nil,
-        debounce_timeout   = 10,
-        enable_line_number = true,
-        blacklist          = {},
-        buttons            = {
-          { label = "View on GitHub", url = "https://github.com" },
-        },
-        file_assets        = {},
-        show_time          = true,
-        editing_text        = "Editing %s",
-        file_explorer_text  = "Browsing %s",
-        git_commit_text     = "Committing changes",
-        plugin_manager_text = "Managing plugins",
-        reading_text        = "Reading %s",
-        workspace_text      = "Working on %s",
-        line_number_text    = "Line %s out of %s",
-      })
-    end,
+    opts = {
+      usercmds        = true,
+      timer           = {
+        interval        = 1500,
+        reset_on_idle   = false,
+        reset_on_change = false,
+      },
+      editor          = {
+        client        = "neovim",
+        tooltip       = "The One True Editor",
+      },
+      display         = {
+        show_time       = true,
+        show_repository = true,
+      },
+      lsp             = {
+        show_problem_count = true,
+      },
+      buttons         = {
+        { label = "View on GitHub", url = "https://github.com" },
+      },
+    },
   },
 
   -- ── 4. ERROR LENS (inline diagnostics) ───────────────────
@@ -747,7 +746,7 @@ require("lazy").setup({
     "nvim-telescope/telescope.nvim",
     dependencies = {
       "nvim-lua/plenary.nvim",
-      { "nvim-telescope/telescope-fzf-native.nvim", build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake
+      { "nvim-telescope/telescope-fzf-native.nvim", build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build" },
     },
     cmd = "Telescope",
     keys = {
@@ -864,7 +863,7 @@ require("lazy").setup({
     config = function()
       require("toggleterm").setup({
         size         = 15,
-        open_mapping = [[<C-`>]],
+        open_mapping = [[<C-t>]],
         direction    = "horizontal",
         shade_terminals  = true,
         shell        = vim.o.shell,
@@ -940,6 +939,16 @@ require("lazy").setup({
       },
     },
   },
+})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  group    = vim.api.nvim_create_augroup("format_on_save", { clear = true }),
+  callback = function()
+    if not vim.bo.modifiable then return end  -- add this line
+    if vim.lsp.buf.server_ready and vim.lsp.buf.server_ready() then
+      vim.lsp.buf.format({ async = false })
+    end
+  end,
 })
 
 local opt = vim.opt
