@@ -12,6 +12,25 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader      = " "
 vim.g.maplocalleader = " "
 
+-- ── Set shell BEFORE lazy so toggleterm picks it up ──────────
+if vim.fn.has("win32") == 1 then
+  vim.o.shell        = "powershell"
+  vim.o.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
+  vim.o.shellxquote  = ""
+  vim.o.shellquote   = ""
+  vim.o.shellredir   = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
+  vim.o.shellpipe    = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
+end
+
+if vim.fn.has("win32") == 1 then
+  vim.g.clipboard = {
+    name  = "win32yank",
+    copy  = { ["+"] = "win32yank.exe -i --crlf", ["*"] = "win32yank.exe -i --crlf" },
+    paste = { ["+"] = "win32yank.exe -o --lf",   ["*"] = "win32yank.exe -o --lf" },
+    cache_enabled = 0,
+  }
+end
+
 require("lazy").setup({
 
   -- ── 1. NIGHTFOX (VSCode dark theme) ──────────────────────
@@ -152,7 +171,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 3. DISCORD PRESENCE (via presence.nvim) ──────────────
+  -- ── 3. DISCORD PRESENCE ──────────────────────────────────
   {
     "vyfor/cord.nvim",
     build = ":Cord update",
@@ -239,7 +258,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 5b. NEO-TREE (file explorer, replaces nvim-tree) ─────
+  -- ── 5b. NEO-TREE (file explorer) ─────────────────────────
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
@@ -330,7 +349,6 @@ require("lazy").setup({
           position = "left",
           width    = 30,
           mappings = {
-            -- Space = open action menu (like right-click in VSCode)
             ["<space>"] = function(state)
               local cmds = require("neo-tree.sources.filesystem.commands")
               local node  = state.tree:get_node()
@@ -476,7 +494,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 7. LSP + AUTOCOMPLETE (VSCode IntelliSense feel) ─────
+  -- ── 7. LSP + AUTOCOMPLETE ────────────────────────────────
   {
     "williamboman/mason.nvim",
     dependencies = {
@@ -629,7 +647,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 8. TREESITTER (syntax highlighting) ──────────────────
+  -- ── 8. TREESITTER ────────────────────────────────────────
   {
     "nvim-treesitter/nvim-treesitter",
     build   = ":TSUpdate",
@@ -667,7 +685,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 9. STATUSLINE (VSCode bottom bar) ────────────────────
+  -- ── 9. STATUSLINE ────────────────────────────────────────
   {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -708,7 +726,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 10. TABLINE (VSCode-style tabs) ──────────────────────
+  -- ── 10. TABLINE ──────────────────────────────────────────
   {
     "akinsho/bufferline.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -741,7 +759,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 11. TELESCOPE (VSCode Ctrl+P / Command Palette) ──────
+  -- ── 11. TELESCOPE ────────────────────────────────────────
   {
     "nvim-telescope/telescope.nvim",
     dependencies = {
@@ -750,7 +768,7 @@ require("lazy").setup({
     },
     cmd = "Telescope",
     keys = {
-      { "<C-p>",      "<cmd>Telescope find_files<cr>",  desc = "Find Files (VSCode Ctrl+P)" },
+      { "<C-p>",      "<cmd>Telescope find_files<cr>",  desc = "Find Files" },
       { "<leader>fg", "<cmd>Telescope live_grep<cr>",   desc = "Live Grep" },
       { "<leader>fb", "<cmd>Telescope buffers<cr>",     desc = "Buffers" },
       { "<C-S-p>",    "<cmd>Telescope commands<cr>",    desc = "Command Palette" },
@@ -771,7 +789,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 12. GIT SIGNS (VSCode gutter indicators) ─────────────
+  -- ── 12. GIT SIGNS ────────────────────────────────────────
   {
     "lewis6991/gitsigns.nvim",
     event = "BufReadPost",
@@ -795,7 +813,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 13. INDENT GUIDES (VSCode indent lines) ──────────────
+  -- ── 13. INDENT GUIDES ────────────────────────────────────
   {
     "lukas-reineke/indent-blankline.nvim",
     main  = "ibl",
@@ -810,7 +828,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 14. AUTO PAIRS (VSCode auto-close brackets) ──────────
+  -- ── 14. AUTO PAIRS ───────────────────────────────────────
   {
     "windwp/nvim-autopairs",
     event = "InsertEnter",
@@ -823,7 +841,7 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 15. WHICH-KEY (keybind popup) ────────────────────────
+  -- ── 15. WHICH-KEY ────────────────────────────────────────
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -833,7 +851,7 @@ require("lazy").setup({
     },
   },
 
-  -- ── 16. NOTIFY (VSCode-style notifications) ───────────────
+  -- ── 16. NOTIFY ───────────────────────────────────────────
   {
     "rcarriga/nvim-notify",
     event  = "VeryLazy",
@@ -849,14 +867,14 @@ require("lazy").setup({
     end,
   },
 
-  -- ── 17. NOICE (disabled on Windows — causes freeze & press-enter prompts) ──
+  -- ── 17. NOICE (disabled on Windows) ──────────────────────
   {
     "folke/noice.nvim",
     enabled = false,
     dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
   },
 
-  -- ── 18. TERMINAL (VSCode integrated terminal) ─────────────
+  -- ── 18. TERMINAL ─────────────────────────────────────────
   {
     "akinsho/toggleterm.nvim",
     lazy  = false,
@@ -878,18 +896,18 @@ require("lazy").setup({
         pattern  = "term://*toggleterm*",
         callback = function()
           local opts = { buffer = 0 }
-          vim.keymap.set("t", "<Esc>",  [[<C-\><C-n>]],           opts)
-          vim.keymap.set("t", "<C-`>",  "<cmd>ToggleTerm<cr>",    opts)
-          vim.keymap.set("t", "<C-h>",  [[<C-\><C-n><C-w>h]],    opts)
-          vim.keymap.set("t", "<C-j>",  [[<C-\><C-n><C-w>j]],    opts)
-          vim.keymap.set("t", "<C-k>",  [[<C-\><C-n><C-w>k]],    opts)
-          vim.keymap.set("t", "<C-l>",  [[<C-\><C-n><C-w>l]],    opts)
+          vim.keymap.set("t", "<Esc>",  [[<C-\><C-n>]],        opts)
+          vim.keymap.set("t", "<C-t>",  "<cmd>ToggleTerm<cr>", opts)
+          vim.keymap.set("t", "<C-h>",  [[<C-\><C-n><C-w>h]], opts)
+          vim.keymap.set("t", "<C-j>",  [[<C-\><C-n><C-w>j]], opts)
+          vim.keymap.set("t", "<C-k>",  [[<C-\><C-n><C-w>k]], opts)
+          vim.keymap.set("t", "<C-l>",  [[<C-\><C-n><C-w>l]], opts)
         end,
       })
     end,
   },
 
-  -- ── 19. DASHBOARD (VSCode welcome screen feel) ───────────
+  -- ── 19. DASHBOARD ────────────────────────────────────────
   {
     "goolord/alpha-nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -919,6 +937,45 @@ require("lazy").setup({
     end,
   },
 
+  -- ── 20. SCROLLBAR ────────────────────────────────────────
+  {
+    "petertriho/nvim-scrollbar",
+    event = "BufReadPost",
+    config = function()
+      require("scrollbar").setup({
+        show = true,
+        set_highlights = true,
+        folds = 1000,
+        max_lines = false,
+        handle = {
+          text = " ",
+          color = "#6b6b6b",
+          hide_if_all_visible = true,
+        },
+        marks = {
+          Search  = { color = "#d7ba7d" },
+          Error   = { color = "#f44747" },
+          Warn    = { color = "#ff8c00" },
+          Info    = { color = "#3794ff" },
+          Hint    = { color = "#4ec9b0" },
+          Misc    = { color = "#c586c0" },
+        },
+        handlers = {
+          cursor      = true,
+          diagnostic  = true,
+          gitsigns    = true,
+          search      = false,
+        },
+        excluded_filetypes = {
+          "neo-tree",
+          "alpha",
+          "toggleterm",
+        },
+      })
+      vim.api.nvim_set_hl(0, "ScrollbarHandle", { bg = "#6b6b6b" })
+    end,
+  },
+
 }, {
   ui = {
     border = "rounded",
@@ -941,16 +998,7 @@ require("lazy").setup({
   },
 })
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group    = vim.api.nvim_create_augroup("format_on_save", { clear = true }),
-  callback = function()
-    if not vim.bo.modifiable then return end  -- add this line
-    if vim.lsp.buf.server_ready and vim.lsp.buf.server_ready() then
-      vim.lsp.buf.format({ async = false })
-    end
-  end,
-})
-
+-- ─── OPTIONS ────────────────────────────────────────────────
 local opt = vim.opt
 
 opt.number         = true
@@ -1002,6 +1050,7 @@ opt.foldmethod     = "expr"
 opt.foldexpr       = "nvim_treesitter#foldexpr()"
 opt.foldlevel      = 99
 
+-- ─── KEYMAPS ────────────────────────────────────────────────
 local map = vim.keymap.set
 
 -- ── SAVE ─────────────────────────────────────────────────────
@@ -1018,7 +1067,7 @@ map("n", "<C-y>", "<C-r>", { desc = "Redo" })
 
 -- ── COPY / PASTE / DELETE ─────────────────────────────────────
 map("v", "y", "ygv<Esc>", { noremap = true, desc = "Copy (stay in place)" })
-map("v", "<C-c>", '"+y', { desc = "Copy to clipboard" })
+map("v", "<C-c>", '"+y',   { desc = "Copy to clipboard" })
 map("n", "<C-v>", '"+p',   { desc = "Paste from clipboard" })
 map("i", "<C-v>", '<C-r>+', { desc = "Paste from clipboard (insert)" })
 map("n", "<leader>d", '"_d',  { noremap = true, desc = "Delete (no yank)" })
@@ -1031,7 +1080,7 @@ map("n", "<leader>a", "ggVG", { desc = "Select all" })
 -- ── CLOSE BUFFER ─────────────────────────────────────────────
 map("n", "<C-w>", "<cmd>bd<cr>", { desc = "Close buffer" })
 
--- ── FILE EXPLORER (neo-tree) ──────────────────────────────────
+-- ── FILE EXPLORER ────────────────────────────────────────────
 map("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle Explorer" })
 map("n", "<C-b>",     "<cmd>Neotree toggle<cr>", { desc = "Toggle Explorer" })
 
@@ -1068,20 +1117,13 @@ map("n", "<leader>fs", function()
   })
 end, { desc = "Find files from current file's folder" })
 
-map("n", "<leader>fr", require("telescope.builtin").oldfiles,
-  { desc = "Recent files" })
-
-map("n", "<C-p>", "<cmd>Telescope find_files<cr>", { desc = "Find files" })
-
-map("n", "<C-S-p>", "<cmd>Telescope commands<cr>", { desc = "Command palette" })
-
-map("n", "<leader>fd", "<cmd>Telescope diagnostics<cr>", { desc = "Diagnostics" })
-
-map("n", "<leader>fg", "<cmd>Telescope live_grep<cr>", { desc = "Live grep" })
-
-map("n", "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Buffers" })
-
-map("n", "<leader>th", "<cmd>Telescope colorscheme<cr>", { desc = "Colorscheme" })
+map("n", "<leader>fr", require("telescope.builtin").oldfiles, { desc = "Recent files" })
+map("n", "<C-p>",      "<cmd>Telescope find_files<cr>",       { desc = "Find files" })
+map("n", "<C-S-p>",    "<cmd>Telescope commands<cr>",         { desc = "Command palette" })
+map("n", "<leader>fd", "<cmd>Telescope diagnostics<cr>",      { desc = "Diagnostics" })
+map("n", "<leader>fg", "<cmd>Telescope live_grep<cr>",        { desc = "Live grep" })
+map("n", "<leader>fb", "<cmd>Telescope buffers<cr>",          { desc = "Buffers" })
+map("n", "<leader>th", "<cmd>Telescope colorscheme<cr>",      { desc = "Colorscheme" })
 
 map("n", "<leader>vc", function()
   require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") })
@@ -1118,7 +1160,11 @@ map("n", "<C-S-Tab>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev tab" })
 map("n", "<leader>t1", "<cmd>1ToggleTerm<cr>", { desc = "Terminal 1" })
 map("n", "<leader>t2", "<cmd>2ToggleTerm<cr>", { desc = "Terminal 2" })
 map("n", "<leader>t3", "<cmd>3ToggleTerm<cr>", { desc = "Terminal 3" })
+map("n", "<leader>tf", "<cmd>ToggleTerm direction=float<cr>",      { desc = "Float terminal" })
+map("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical<cr>",   { desc = "Vertical terminal" })
+map("n", "<leader>th", "<cmd>ToggleTerm direction=horizontal<cr>", { desc = "Horizontal terminal" })
 
+-- ── RUN CODE ─────────────────────────────────────────────────
 local function run_code()
   vim.cmd("write")
 
@@ -1181,13 +1227,14 @@ local function run_code()
   runner:toggle()
 end
 
-map("n", "<F5>",    run_code, { desc = "Run current file" })
-map("n", "<C-F5>",  run_code, { desc = "Run current file" })
+map("n", "<F5>",      run_code, { desc = "Run current file" })
+map("n", "<C-F5>",    run_code, { desc = "Run current file" })
 map("n", "<leader>r", run_code, { desc = "Run current file" })
 
 -- ── CLEAR SEARCH HIGHLIGHT ───────────────────────────────────
 map("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
 
+-- ─── AUTOCMDS ───────────────────────────────────────────────
 vim.api.nvim_create_autocmd("TextYankPost", {
   group    = vim.api.nvim_create_augroup("highlight_yank", { clear = true }),
   callback = function() vim.highlight.on_yank({ higroup = "Visual", timeout = 200 }) end,
@@ -1206,6 +1253,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 vim.api.nvim_create_autocmd("BufWritePre", {
   group    = vim.api.nvim_create_augroup("format_on_save", { clear = true }),
   callback = function()
+    if not vim.bo.modifiable then return end
     if vim.lsp.buf.server_ready and vim.lsp.buf.server_ready() then
       vim.lsp.buf.format({ async = false })
     end
@@ -1223,20 +1271,13 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
-if vim.fn.has("win32") == 1 then
-  vim.o.shell        = "powershell"
-  vim.o.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command"
-  vim.o.shellxquote  = ""
-  vim.o.shellquote   = ""
-  vim.o.shellredir   = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
-  vim.o.shellpipe    = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
-end
-
-if vim.fn.has("win32") == 1 then
-  vim.g.clipboard = {
-    name  = "win32yank",
-    copy  = { ["+"] = "win32yank.exe -i --crlf", ["*"] = "win32yank.exe -i --crlf" },
-    paste = { ["+"] = "win32yank.exe -o --lf",   ["*"] = "win32yank.exe -o --lf" },
-    cache_enabled = 0,
-  }
-end
+-- ── AUTO RELOAD FILE WHEN CHANGED OUTSIDE NEOVIM ────────────
+vim.o.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  group    = vim.api.nvim_create_augroup("auto_reload", { clear = true }),
+  callback = function()
+    if vim.fn.mode() ~= "c" and vim.fn.bufname("%") ~= "" then
+      vim.cmd("checktime")
+    end
+  end,
+})
